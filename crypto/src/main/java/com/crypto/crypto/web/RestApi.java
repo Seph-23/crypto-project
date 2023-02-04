@@ -8,7 +8,7 @@ public class RestApi {
   @SneakyThrows
   public void returnStatus(){
     HttpResponse<String> response = Unirest.get("https://api.upbit.com/v1/candles/days?count=1")
-            .header("accpet","application/json")
+            .header("accept","application/json")
             .asString();
   }
 }
