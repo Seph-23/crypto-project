@@ -30,6 +30,8 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
 	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 
+	implementation 'com.mashape.unirest:unirest-java:1.4.9'
+
 }
 
 tasks.named('test') {
