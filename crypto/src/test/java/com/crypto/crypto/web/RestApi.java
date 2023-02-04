@@ -26,6 +26,10 @@ public class RestApi {
       String[] newMessage = testMessage.split("},", 200);
       for(int i = 0; i < newMessage.length; i++){
         System.out.println(newMessage[i]);
+        String[] information = newMessage[i].split(",", 13);
+        for(int n = 0; i < information.length; i++){
+        
+        }
       }
       
     }
