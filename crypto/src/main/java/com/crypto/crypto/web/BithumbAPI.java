@@ -1,19 +1,25 @@
-package com.crypto.crypto.controller;
+package com.crypto.crypto.web;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-@RestController
-public class UpbitController {
-  @GetMapping("/api/upbit/price")
-  public String getPrice(){
+@Service
+public class BithumbAPI {
+
+  public void getPrice(String coin) {
     try {
+      //호출할 코인 URL 빌드
+      StringBuilder sb = new StringBuilder();
+      sb.append("https://api.bithumb.com/public/candlestick/")
+        .append(coin)
+        .append("/24h");
+
+      //업비트 API 요청
       HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create("https://api.upbit.com/v1/candles/days?market=KRW-DOGE&to=2023-02-04%2023%3A59%3A59&count=200"))
+        .uri(URI.create(sb.toString()))
         .header("accept", "application/json")
         .method("GET", HttpRequest.BodyPublishers.noBody())
         .build();
@@ -22,6 +28,6 @@ public class UpbitController {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    return "hello";
   }
+
 }
