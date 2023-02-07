@@ -5,14 +5,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
 
 @Entity
-public class UpbitCoinWeek {
+@Getter
+public class BithumbCoinData {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "coin_week_id")
   private Long id;
-
 
 }

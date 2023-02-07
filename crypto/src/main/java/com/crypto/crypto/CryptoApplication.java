@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 
 @SpringBootApplication
 public class CryptoApplication {
@@ -15,13 +16,12 @@ public class CryptoApplication {
 		SpringApplication.run(CryptoApplication.class, args);
 	}
 
+	@Order(1)
 	@Bean
 	public CommandLineRunner initCoinData(UpbitAPI upbitAPI, BithumbAPI bithumbAPI) {
 		return args -> IntStream.rangeClosed(0, 1).forEach(i -> {
 			String[] coins = {"BTC", "ETH", "XRP", "ADA", "DOGE"};
-//			upbitAPI.getPrice(coins[i]);
-			bithumbAPI.getPrice(coins[i]);
+			bithumbAPI.getData(coins[i]);
 		});
 	}
-
 }
