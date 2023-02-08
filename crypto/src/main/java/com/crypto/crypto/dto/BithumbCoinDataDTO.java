@@ -16,5 +16,4 @@ public class BithumbCoinDataDTO {   //Daily
   private String lowPrice;
   private String candleAccTradeVolume;
 
-
 }
