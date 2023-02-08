@@ -23,6 +23,8 @@ public class CryptoApplication {
 					"SRM", "ONG", "POWR", "DAR"
 	};
 	
+	public String date = "2023-02-09";
+	
 	public static void main(String[] args) {
 		SpringApplication.run(CryptoApplication.class, args);
 	}
@@ -30,10 +32,22 @@ public class CryptoApplication {
 	@Bean
 	public CommandLineRunner initCoinData(UpbitApi upbitApi, UpbitCoinService upbitCoinService){
 		return args -> IntStream.range(0,coins.length).forEach(i ->{
-			String[] coinInfo = upbitApi.getCoinHistory(coins[i]);
-			saveCoin(coinInfo, coins[i], upbitCoinService);
+			boolean repeat = true;
+			
+			while(repeat){
+				String[] coinInfo = upbitApi.getCoinHistory(coins[i], date);
+				saveCoin(coinInfo, coins[i], upbitCoinService);
+				repeatSearch(coinInfo, date);
+				date = parseDate(coinInfo);
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
@@ -53,6 +67,26 @@ public class CryptoApplication {
 			
 			upbitCoinService.addData(upbitCoinDataDTO);
 		}
+	}
+	
+	public boolean repeatSearch(String[] coinInfo, String date){
+		boolean repeat = true;
+		
+		String lastDate = parseDate(coinInfo);
+		
+		if(lastDate.equals(date)){
+			repeat = false;
+		}
+		
+		return repeat;
+	}
+	
+	public String parseDate(String[] coinInfo){
+		String lastSearch = coinInfo[coinInfo.length-1];
+		String lastCoinDate = lastSearch.split(",")[2];
+		String lastKst = lastCoinDate.split("\":\"")[1].replace("\"", "");
+		String lastDate = lastKst.split("T")[0];
+		return lastDate;
 	}
 	
 	//Method for setting the entity

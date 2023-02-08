@@ -1,20 +1,20 @@
 package com.crypto.crypto.web;
 
 import com.crypto.crypto.dto.UpbitCoinDataDTO;
-import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 public class UpbitApi {
   static final String coinName = "btc";
   //, "eth", "xrp", "ada", "doge", "matic", "sol", "dot", "avax"
   static final HttpResponse<String> string = null;
+  
+  String searchDate = "2023-02-09%2000%3A00%3A00";
+  String date = "2022-07-24";
   
   @Test
   public void returnStatus() throws Exception {
@@ -63,6 +63,39 @@ public class UpbitApi {
             .changeRate(tempInfo)
             .build();
     return coin;
+  }
+  
+  
+  @Test
+  public void repeatSearch() throws Exception{
+    boolean repeat = true;
+  
+    HttpResponse<String> response = Unirest.get("https://api.upbit.com/v1/candles/days?market=krw-" + coinName + "&to=" + searchDate + "&count=200")
+            .header("accept", "application/json")
+            .asString();
+  
+    String testMessage = response.getBody();
+    testMessage = testMessage.replace("{", "");
+    testMessage = testMessage.replace("[", "");
+    String[] coinInfo = testMessage.split("},");
+    
+    String lastSearch = coinInfo[coinInfo.length-1];
+    System.out.println(lastSearch);
+    String lastCoinDate = lastSearch.split(",")[2];
+    System.out.println(lastCoinDate);
+    String lastKst = lastCoinDate.split("\":\"")[1].replace("\"", "");
+    System.out.println(lastKst);
+    String lastDate = lastKst.split("T")[0];
+    System.out.println(lastDate);
+    
+  
+    if(lastDate.equals(date)){
+      repeat = false;
+    }
+  
+    System.out.println(repeat);
+    
+    Assert.assertTrue(repeat);
   }
 }
 
