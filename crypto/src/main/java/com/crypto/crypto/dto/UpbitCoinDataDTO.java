@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+import java.time.LocalDateTime;
+
+@Builder
 @Data
 public class UpbitCoinDataDTO {
   
   private String coin;
   private String market;
-  private String candleDateTimeUtc;
-  private String candleDateTimeKst;
+  private LocalDateTime candleDateTimeUtc;
+  private LocalDateTime candleDateTimeKst;
   private String openingPrice;
   private String highPrice;
   private String lowPrice;

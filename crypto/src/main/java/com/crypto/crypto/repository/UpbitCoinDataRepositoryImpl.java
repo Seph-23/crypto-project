@@ -2,7 +2,11 @@ package com.crypto.crypto.repository;
 
 //Quarry method implement page
 
-public class UpbitCoinDataRepositoryImpl implements UpbitCoinDataRepositoryInterface {
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
+@Repository
+@RequiredArgsConstructor
+public class UpbitCoinDataRepositoryImpl implements UpbitCoinDataRepositoryInterface {
 
 }
