@@ -1,5 +1,6 @@
 package com.crypto.crypto.service;
 
+import com.crypto.crypto.domain.BithumbCoinData;
 import com.crypto.crypto.dto.BithumbCoinDataDTO;
 import com.crypto.crypto.repository.BithumbRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,9 @@ public class BithumbService {
 
   @Transactional
   public void addData(BithumbCoinDataDTO bithumbCoinDataDTO) {
-
+    BithumbCoinData bithumbCoinData = BithumbCoinData
+      .createFromBithumbCoinDataDto(bithumbCoinDataDTO);
+    bithumbRepository.save(bithumbCoinData);
   }
 
 }

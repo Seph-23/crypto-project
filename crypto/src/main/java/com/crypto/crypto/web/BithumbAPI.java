@@ -29,7 +29,7 @@ public class BithumbAPI {
       .build();
     HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-//    System.out.println(response.body());
+    System.out.println("BithumbAPI 요청");
 
     return response.body();
   }
