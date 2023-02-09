@@ -9,5 +9,5 @@ class CryptoApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
+	
 }

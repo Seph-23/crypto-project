@@ -33,6 +33,15 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation:3.0.2'
 
+	implementation 'com.mashape.unirest:unirest-java:1.4.9'
+
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
+
+	implementation 'com.google.code.gson:gson:2.10.1'
+
+	implementation 'mysql:mysql-connector-java:8.0.32'
+
+	implementation 'org.springframework.boot:spring-boot-starter-validation:3.0.2'
 }
 
 tasks.named('test') {
