@@ -1,29 +1,27 @@
 package com.crypto.crypto;
 
-import com.crypto.crypto.dto.UpbitCoinDataDTO;
-import com.crypto.crypto.service.UpbitCoinService;
-import com.crypto.crypto.web.UpbitApi;
 import com.crypto.crypto.dto.BithumbCoinDataDTO;
+import com.crypto.crypto.dto.UpbitCoinDataDTO;
 import com.crypto.crypto.service.BithumbService;
+import com.crypto.crypto.service.UpbitCoinService;
 import com.crypto.crypto.web.BithumbAPI;
+import com.crypto.crypto.web.UpbitApi;
 import com.google.gson.Gson;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.IntStream;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
-import java.time.LocalDateTime;
-import java.util.stream.IntStream;
+import org.springframework.core.annotation.Order;
 
 @SpringBootApplication
 public class CryptoApplication {
-	
+
+	private static Gson gson = new Gson();
 	//List of crypto names
 	private static String[] coins = {
 					"BTC", "ETH", "XRP", "ADA", "DOGE", "MATIC", "SOL", "DOT", "AVAX", "TRX", "ATOM", "LINK", "ETC",
@@ -32,15 +30,21 @@ public class CryptoApplication {
 					"ICX", "OMG", "ZRX", "HIVE", "ONT", "IOST", "WAXP", "SXP", "KNC", "PLA", "PUNDIX", "SNT", "ELF",
 					"SRM", "ONG", "POWR", "DAR"
 	};
-	
-	public String date = "2023-02-09";
+
+	private static String date = "2023-02-09";
 	
 	public static void main(String[] args) {
 		SpringApplication.run(CryptoApplication.class, args);
 	}
-	
+
+	/**
+	 * 업비트 과거 데이터 컬렉터
+	 * @param upbitApi
+	 * @param upbitCoinService
+	 * @return
+	 */
 	@Bean
-	public CommandLineRunner initCoinData(UpbitApi upbitApi, UpbitCoinService upbitCoinService){
+	public CommandLineRunner initUpbitCoinData(UpbitApi upbitApi, UpbitCoinService upbitCoinService){
 		return args -> IntStream.range(0,coins.length).forEach(i ->{
 			boolean repeat = true;
 			
@@ -60,6 +64,39 @@ public class CryptoApplication {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
+			}
+		});
+	}
+
+	/**
+	 * 빗썸 과거 데이터 컬렉터
+	 * @param bithumbAPI
+	 * @param bithumbService
+	 * @return
+	 */
+	@Bean
+	public CommandLineRunner initBithumbCoinData(BithumbAPI bithumbAPI, BithumbService bithumbService) {
+		return args -> IntStream.range(0, coins.length).forEach(i -> {
+			try {
+				String data = bithumbAPI.getData(coins[i]);
+				Map<String, Object> map = gson.fromJson(data, Map.class);	// map.get("status"), map.get("data")
+				String dataStr = null;
+
+				if (map.get("status").toString().equals("0000")) {				// 통신 성공시 (status code: 0000)
+					dataStr = map.get("data").toString();
+					dataStr = dataStr.replace("[", "");
+					String[] coinData = dataStr.split("], ");
+
+					for (String coinDatum : coinData) {
+						String[] dailyData = coinDatum.split(", ");		// {기준 시간, 시가, 종가, 고가, 저가, 거래량}
+
+						BithumbCoinDataDTO bithumbCoinDataDTO = bithumbCoinDataDtoFromStringArray(dailyData, i);
+						bithumbService.addData(bithumbCoinDataDTO);
+					}
+				}
+				Thread.sleep(10000);			//10초에 한번씩 요청
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		});
 	}
@@ -120,33 +157,6 @@ public class CryptoApplication {
 		return coin;
   }
 
-	@Order(1)
-	@Bean
-	public CommandLineRunner initCoinData(BithumbAPI bithumbAPI, BithumbService bithumbService) {
-		return args -> IntStream.range(0, coins.length).forEach(i -> {
-			try {
-				String data = bithumbAPI.getData(coins[i]);
-				Map<String, Object> map = gson.fromJson(data, Map.class);	// map.get("status"), map.get("data")
-				String dataStr = null;
-
-				if (map.get("status").toString().equals("0000")) {				// 통신 성공시 (status code: 0000)
-					dataStr = map.get("data").toString();
-					dataStr = dataStr.replace("[", "");
-					String[] coinData = dataStr.split("], ");
-
-					for (String coinDatum : coinData) {
-						String[] dailyData = coinDatum.split(", ");		// {기준 시간, 시가, 종가, 고가, 저가, 거래량}
-
-						BithumbCoinDataDTO bithumbCoinDataDTO = bithumbCoinDataDtoFromStringArray(dailyData, i);
-						bithumbService.addData(bithumbCoinDataDTO);
-					}
-				}
-				Thread.sleep(10000);			//10초에 한번씩 요청
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
-	}
 
 	/**
 	 * 빗썸에서 제공하는 캔들 기준 시간(millisecond)를 LocalDateTime으로 변환하는 메서드.
