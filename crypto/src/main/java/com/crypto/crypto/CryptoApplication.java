@@ -31,8 +31,6 @@ public class CryptoApplication {
 					"SRM", "ONG", "POWR", "DAR"
 	};
 
-	private static String date = "2023-02-09";
-	
 	public static void main(String[] args) {
 		SpringApplication.run(CryptoApplication.class, args);
 	}
@@ -47,21 +45,26 @@ public class CryptoApplication {
 	public CommandLineRunner initUpbitCoinData(UpbitApi upbitApi, UpbitCoinService upbitCoinService){
 		return args -> IntStream.range(0,coins.length).forEach(i ->{
 			boolean repeat = true;
-			
+
+			String date = "2023-02-09";
+
 			while(repeat){
 				String[] coinInfo = upbitApi.getCoinHistory(coins[i], date);
+				if(coinInfo.length == 1){
+					break;
+				}
 				saveCoin(coinInfo, coins[i], upbitCoinService);
 				repeatSearch(coinInfo, date);
 				date = parseDate(coinInfo);
 				try {
-					Thread.sleep(3000);
+					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e);
 				}
 			}
 			
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
@@ -94,7 +97,7 @@ public class CryptoApplication {
 						bithumbService.addData(bithumbCoinDataDTO);
 					}
 				}
-				Thread.sleep(10000);			//10초에 한번씩 요청
+				Thread.sleep(1000);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

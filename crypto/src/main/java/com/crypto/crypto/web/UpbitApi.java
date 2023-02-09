@@ -16,6 +16,7 @@ public class UpbitApi {
               .header("accept", "application/json")
               .asString();
       String[] temp = parseData(response);
+      System.out.println("Upbit " + coinName + " 요청");
       return temp;
     }
     else {
@@ -23,6 +24,7 @@ public class UpbitApi {
               .header("accept", "application/json")
               .asString();
       String[] temp = parseData(response);
+      System.out.println("Upbit " + coinName + " 요청");
       return temp;
     }
   }
@@ -31,9 +33,9 @@ public class UpbitApi {
     String testMessage = response.getBody();
     testMessage = testMessage.replace("{", "");
     testMessage = testMessage.replace("[", "");
-    System.out.println(testMessage);
+//    System.out.println(testMessage);
     String[] coinInfo = testMessage.split("},");
     return coinInfo;
   }
-  
+
 }
