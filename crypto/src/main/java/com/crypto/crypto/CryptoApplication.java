@@ -4,6 +4,7 @@ import com.crypto.crypto.dto.BithumbCoinDataDTO;
 import com.crypto.crypto.dto.UpbitCoinDataDTO;
 import com.crypto.crypto.service.BithumbService;
 import com.crypto.crypto.service.UpbitCoinService;
+import com.crypto.crypto.web.BinanceAPI;
 import com.crypto.crypto.web.BithumbAPI;
 import com.crypto.crypto.web.UpbitApi;
 import com.google.gson.Gson;
@@ -35,13 +36,25 @@ public class CryptoApplication {
 		SpringApplication.run(CryptoApplication.class, args);
 	}
 
+	@Bean
+	public CommandLineRunner initBinanceCoinData(BinanceAPI binanceAPI) {
+		return args -> IntStream.range(0, coins.length).forEach(i -> {
+			try {
+				binanceAPI.getData(coins[i]);
+				Thread.sleep(1000);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
 	/**
 	 * 업비트 과거 데이터 컬렉터
 	 * @param upbitApi
 	 * @param upbitCoinService
 	 * @return
 	 */
-	@Bean
+//	@Bean
 	public CommandLineRunner initUpbitCoinData(UpbitApi upbitApi, UpbitCoinService upbitCoinService){
 		return args -> IntStream.range(0,coins.length).forEach(i ->{
 			boolean repeat = true;
@@ -77,7 +90,7 @@ public class CryptoApplication {
 	 * @param bithumbService
 	 * @return
 	 */
-	@Bean
+//	@Bean
 	public CommandLineRunner initBithumbCoinData(BithumbAPI bithumbAPI, BithumbService bithumbService) {
 		return args -> IntStream.range(0, coins.length).forEach(i -> {
 			try {
