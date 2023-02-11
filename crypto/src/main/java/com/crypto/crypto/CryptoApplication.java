@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.stream.IntStream;
 import org.springframework.boot.CommandLineRunner;
@@ -39,24 +40,39 @@ public class CryptoApplication {
 
 	@Bean
 	public CommandLineRunner initBinanceCoinData(BinanceAPI binanceAPI, BinanceService binanceService) {
-		return args -> IntStream.range(0, 1).forEach(i -> {
+		return args -> IntStream.range(0, 4).forEach(i -> {
 			try {
-				String data = binanceAPI.getData(coins[i]);
-				data = data.replace("[[", "[");
-				data = data.replace("]]", "]");
-
-				String[] coinData = data.split("],");
-
-				for (int j = 0; j < coinData.length; j++) {
-					coinData[j] = coinData[j].replace("[", "");
-					coinData[j] = coinData[j].replace("]", "");
-					coinData[j] = coinData[j].replace("\"", "");
-					String[] dailyData = coinData[j].split(",");
-					BinanceCoinDataDTO binanceCoinDataDTO = binanceCoinDataDtoFromStringArray(dailyData, i);
-
-					binanceService.addData(binanceCoinDataDTO);
+				
+				LocalDateTime localDateTime = LocalDateTime.parse("2023-02-10T00:00:00");
+				String date = String.valueOf(localDateTime.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli());
+				
+				while(true){
+					String data = binanceAPI.getData(coins[i], date);
+					
+					
+					data = data.replace("[[", "[");
+					data = data.replace("]]", "]");
+					
+					String[] coinData = data.split("],");
+					
+					if(date.equals(coinData[0].split(",")[0].replace("[", "")) || data.length() < 3 ){
+						System.out.println("done");
+						break;
+					}
+					
+					date = coinData[0].split(",")[0].replace("[", "");
+					
+					for (int j = 0; j < coinData.length; j++) {
+						coinData[j] = coinData[j].replace("[", "");
+						coinData[j] = coinData[j].replace("]", "");
+						coinData[j] = coinData[j].replace("\"", "");
+						String[] dailyData = coinData[j].split(",");
+						BinanceCoinDataDTO binanceCoinDataDTO = binanceCoinDataDtoFromStringArray(dailyData, i);
+						
+						binanceService.addData(binanceCoinDataDTO);
+					}
 				}
-
+				
 				Thread.sleep(1000);
 			} catch (Exception e) {
 				e.printStackTrace();
