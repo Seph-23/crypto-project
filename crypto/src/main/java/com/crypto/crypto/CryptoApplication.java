@@ -1,9 +1,11 @@
 package com.crypto.crypto;
 
+import com.crypto.crypto.dto.BinanceCoinDataDTO;
 import com.crypto.crypto.dto.BithumbCoinDataDTO;
 import com.crypto.crypto.dto.UpbitCoinDataDTO;
+import com.crypto.crypto.service.BinanceService;
 import com.crypto.crypto.service.BithumbService;
-import com.crypto.crypto.service.UpbitCoinService;
+import com.crypto.crypto.service.UpbitService;
 import com.crypto.crypto.web.BinanceAPI;
 import com.crypto.crypto.web.BithumbAPI;
 import com.crypto.crypto.web.UpbitApi;
@@ -17,7 +19,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.annotation.Order;
 
 @SpringBootApplication
 public class CryptoApplication {
@@ -29,7 +30,7 @@ public class CryptoApplication {
 					"BCH", "XLM", "ALGO", "VET", "MANA", "AAVE", "EOS", "AXS", "SAND", "THETA", "XTZ", "CHZ", "XEC",
 					"BTT", "ENJ", "ZIL", "T", "1INCH", "BAT", "GMT", "TFUEL", "QTUM", "WAVES", "ANKR", "GLM", "JST",
 					"ICX", "OMG", "ZRX", "HIVE", "ONT", "IOST", "WAXP", "SXP", "KNC", "PLA", "PUNDIX", "SNT", "ELF",
-					"SRM", "ONG", "POWR", "DAR"
+					"SRM", "POWR", "DAR"
 	};
 
 	public static void main(String[] args) {
@@ -37,10 +38,25 @@ public class CryptoApplication {
 	}
 
 	@Bean
-	public CommandLineRunner initBinanceCoinData(BinanceAPI binanceAPI) {
-		return args -> IntStream.range(0, coins.length).forEach(i -> {
+	public CommandLineRunner initBinanceCoinData(BinanceAPI binanceAPI, BinanceService binanceService) {
+		return args -> IntStream.range(0, 1).forEach(i -> {
 			try {
-				binanceAPI.getData(coins[i]);
+				String data = binanceAPI.getData(coins[i]);
+				data = data.replace("[[", "[");
+				data = data.replace("]]", "]");
+
+				String[] coinData = data.split("],");
+
+				for (int j = 0; j < coinData.length; j++) {
+					coinData[j] = coinData[j].replace("[", "");
+					coinData[j] = coinData[j].replace("]", "");
+					coinData[j] = coinData[j].replace("\"", "");
+					String[] dailyData = coinData[j].split(",");
+					BinanceCoinDataDTO binanceCoinDataDTO = binanceCoinDataDtoFromStringArray(dailyData, i);
+
+					binanceService.addData(binanceCoinDataDTO);
+				}
+
 				Thread.sleep(1000);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -51,11 +67,11 @@ public class CryptoApplication {
 	/**
 	 * 업비트 과거 데이터 컬렉터
 	 * @param upbitApi
-	 * @param upbitCoinService
+	 * @param upbitService
 	 * @return
 	 */
 //	@Bean
-	public CommandLineRunner initUpbitCoinData(UpbitApi upbitApi, UpbitCoinService upbitCoinService){
+	public CommandLineRunner initUpbitCoinData(UpbitApi upbitApi, UpbitService upbitService){
 		return args -> IntStream.range(0,coins.length).forEach(i ->{
 			boolean repeat = true;
 
@@ -66,7 +82,7 @@ public class CryptoApplication {
 				if(coinInfo.length == 1){
 					break;
 				}
-				saveCoin(coinInfo, coins[i], upbitCoinService);
+				saveCoin(coinInfo, coins[i], upbitService);
 				repeatSearch(coinInfo, date);
 				date = parseDate(coinInfo);
 				try {
@@ -118,7 +134,7 @@ public class CryptoApplication {
 	}
 	
 	//Method for saving crypto coin history
-	public void saveCoin(String[] coinInfo, String coinName, UpbitCoinService upbitCoinService){
+	public void saveCoin(String[] coinInfo, String coinName, UpbitService upbitService){
 		for (int i = 0; i < coinInfo.length; i++) {
 			String[] individualCoinInfo = coinInfo[i].split(",");
 			String tempInfo = null;
@@ -128,7 +144,7 @@ public class CryptoApplication {
 			
 			UpbitCoinDataDTO upbitCoinDataDTO = upbitCoinDataDTOBuilder(individualCoinInfo, tempInfo, coinName);
 			
-			upbitCoinService.addData(upbitCoinDataDTO);
+			upbitService.addData(upbitCoinDataDTO);
 		}
 	}
 	
@@ -183,7 +199,7 @@ public class CryptoApplication {
 		String result = String.format("%.0f", Double.parseDouble(milli));
 
 		return Instant.ofEpochMilli(Long.parseLong(result))
-			.atZone(ZoneId.systemDefault())
+			.atZone(ZoneId.of("UTC"))
 			.toLocalDateTime();
 	}
 
@@ -211,5 +227,27 @@ public class CryptoApplication {
 			.build();
 
 		return bithumbCoinDataDTO;
+	}
+
+	public BinanceCoinDataDTO binanceCoinDataDtoFromStringArray(String[] dailyData, int coinsIndex) {
+		LocalDateTime openTime = milliToLocalDateTime(dailyData[0]);
+		LocalDateTime closeTime = milliToLocalDateTime(dailyData[6]);
+
+		BinanceCoinDataDTO binanceCoinDataDTO = BinanceCoinDataDTO.builder()
+			.coin(coins[coinsIndex])
+			.openTime(openTime)
+			.openingPrice(dailyData[1])
+			.highPrice(dailyData[2])
+			.lowPrice(dailyData[3])
+			.closePrice(dailyData[4])
+			.volume(dailyData[5])
+			.closeTime(closeTime)
+			.quoteAssetVolume(dailyData[7])
+			.numTrades(dailyData[8])
+			.takerBuyBaseAssetVolume(dailyData[9])
+			.takerBuyQuoteAssetVolume(dailyData[10])
+			.build();
+
+		return binanceCoinDataDTO;
 	}
 }
