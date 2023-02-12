@@ -40,7 +40,7 @@ public class CryptoApplication {
 
 	@Bean
 	public CommandLineRunner initBinanceCoinData(BinanceAPI binanceAPI, BinanceService binanceService) {
-		return args -> IntStream.range(0, 4).forEach(i -> {
+		return args -> IntStream.range(0, coins.length).forEach(i -> {
 			try {
 				
 				LocalDateTime localDateTime = LocalDateTime.parse("2023-02-10T00:00:00");
@@ -86,7 +86,7 @@ public class CryptoApplication {
 	 * @param upbitService
 	 * @return
 	 */
-//	@Bean
+	@Bean
 	public CommandLineRunner initUpbitCoinData(UpbitApi upbitApi, UpbitService upbitService){
 		return args -> IntStream.range(0,coins.length).forEach(i ->{
 			boolean repeat = true;
@@ -122,7 +122,7 @@ public class CryptoApplication {
 	 * @param bithumbService
 	 * @return
 	 */
-//	@Bean
+	@Bean
 	public CommandLineRunner initBithumbCoinData(BithumbAPI bithumbAPI, BithumbService bithumbService) {
 		return args -> IntStream.range(0, coins.length).forEach(i -> {
 			try {
