@@ -8,12 +8,11 @@ import com.crypto.crypto.service.BithumbService;
 import com.crypto.crypto.service.UpbitService;
 import com.crypto.crypto.web.BinanceAPI;
 import com.crypto.crypto.web.BithumbAPI;
-import com.crypto.crypto.web.UpbitApi;
+import com.crypto.crypto.web.UpbitAPI;
 import com.google.gson.Gson;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.stream.IntStream;
 import org.springframework.boot.CommandLineRunner;
@@ -81,42 +80,6 @@ public class CryptoApplication {
 	}
 
 	/**
-	 * 업비트 과거 데이터 컬렉터
-	 * @param upbitApi
-	 * @param upbitService
-	 * @return
-	 */
-	@Bean
-	public CommandLineRunner initUpbitCoinData(UpbitApi upbitApi, UpbitService upbitService){
-		return args -> IntStream.range(0,coins.length).forEach(i ->{
-			boolean repeat = true;
-
-			String date = "2023-02-09";
-
-			while(repeat){
-				String[] coinInfo = upbitApi.getCoinHistory(coins[i], date);
-				if(coinInfo.length == 1){
-					break;
-				}
-				saveCoin(coinInfo, coins[i], upbitService);
-				repeatSearch(coinInfo, date);
-				date = parseDate(coinInfo);
-				try {
-					Thread.sleep(200);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-			}
-			
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-		});
-	}
-
-	/**
 	 * 빗썸 과거 데이터 컬렉터
 	 * @param bithumbAPI
 	 * @param bithumbService
@@ -148,63 +111,6 @@ public class CryptoApplication {
 			}
 		});
 	}
-	
-	//Method for saving crypto coin history
-	public void saveCoin(String[] coinInfo, String coinName, UpbitService upbitService){
-		for (int i = 0; i < coinInfo.length; i++) {
-			String[] individualCoinInfo = coinInfo[i].split(",");
-			String tempInfo = null;
-			if (individualCoinInfo[12].contains("}")) {
-				tempInfo = (individualCoinInfo[12].replace("}]", "").split("\":")[1]);
-			} else tempInfo = (individualCoinInfo[12].split("\":")[1]);
-			
-			UpbitCoinDataDTO upbitCoinDataDTO = upbitCoinDataDTOBuilder(individualCoinInfo, tempInfo, coinName);
-			
-			upbitService.addData(upbitCoinDataDTO);
-		}
-	}
-	
-	public boolean repeatSearch(String[] coinInfo, String date){
-		boolean repeat = true;
-		
-		String lastDate = parseDate(coinInfo);
-		
-		if(lastDate.equals(date)){
-			repeat = false;
-		}
-		
-		return repeat;
-	}
-	
-	public String parseDate(String[] coinInfo){
-		String lastSearch = coinInfo[coinInfo.length-1];
-		String lastCoinDate = lastSearch.split(",")[2];
-		String lastKst = lastCoinDate.split("\":\"")[1].replace("\"", "");
-		String lastDate = lastKst.split("T")[0];
-		return lastDate;
-	}
-	
-	//Method for setting the entity
-	public UpbitCoinDataDTO upbitCoinDataDTOBuilder(String[] individualCoinInfo, String tempInfo, String coinName){
-		UpbitCoinDataDTO coin = UpbitCoinDataDTO.builder()
-						.coin(coinName)
-						.market(individualCoinInfo[0].split("\":")[1])
-						.candleDateTimeUtc(LocalDateTime.parse(individualCoinInfo[1].split("\":")[1].replace("\"", "")))
-						.candleDateTimeKst(LocalDateTime.parse(individualCoinInfo[2].split("\":")[1].replace("\"", "")))
-						.openingPrice(individualCoinInfo[3].split("\":")[1])
-						.highPrice(individualCoinInfo[4].split("\":")[1])
-						.lowPrice(individualCoinInfo[5].split("\":")[1])
-						.tradePrice(individualCoinInfo[6].split("\":")[1])
-						.timestamp(individualCoinInfo[7].split("\":")[1])
-						.candleAccTradePrice(individualCoinInfo[8].split("\":")[1])
-						.candleAccTradeVolume(individualCoinInfo[9].split("\":")[1])
-						.prevClosingPrice(individualCoinInfo[10].split("\":")[1])
-						.changePrice(individualCoinInfo[11].split("\":")[1])
-						.changeRate(tempInfo)
-						.build();
-		return coin;
-  }
-
 
 	/**
 	 * 빗썸에서 제공하는 캔들 기준 시간(millisecond)를 LocalDateTime으로 변환하는 메서드.
