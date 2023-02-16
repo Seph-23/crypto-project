@@ -2,6 +2,7 @@ package com.crypto.crypto.web;
 
 import com.crypto.crypto.dto.BithumbCoinDataDTO;
 import com.crypto.crypto.service.BithumbService;
+import com.crypto.crypto.utils.TimeConverter;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.URI;
@@ -75,19 +76,6 @@ public class BithumbAPI {
   }
 
   /**
-   * 빗썸에서 제공하는 캔들 기준 시간(millisecond)를 LocalDateTime으로 변환하는 메서드.
-   * @param milli
-   * @return LocalDateTime 캔들날짜
-   */
-  public LocalDateTime milliToLocalDateTime(String milli) {
-    String result = String.format("%.0f", Double.parseDouble(milli));
-
-    return Instant.ofEpochMilli(Long.parseLong(result))
-      .atZone(ZoneId.of("UTC"))
-      .toLocalDateTime();
-  }
-
-  /**
    * 빗썸에서 추출한 일별 코인 데이터를 DTO로 변환하는 메서드.
    * @param dailyData
    * @param coinsIndex
@@ -96,7 +84,7 @@ public class BithumbAPI {
   public BithumbCoinDataDTO bithumbCoinDataDtoFromStringArray(String[] dailyData, int coinsIndex,
     String[] coins) {
 
-    LocalDateTime day = milliToLocalDateTime(dailyData[0]);
+    LocalDateTime day = TimeConverter.milliToLocalDateTime(dailyData[0]);
 
     if (dailyData[5].contains("]]")) {
       dailyData[5] = dailyData[5].replace("]]", "");

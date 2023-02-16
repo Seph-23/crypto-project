@@ -1,5 +1,6 @@
 package com.crypto.crypto.web;
 
+import com.crypto.crypto.utils.TimeConverter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -83,18 +84,10 @@ public class BinanceAPI {
       }
     }
   }
-  
-  public LocalDateTime milliToLocalDateTime(String milli) {
-    String result = String.format("%.0f", Double.parseDouble(milli));
-    
-    return Instant.ofEpochMilli(Long.parseLong(result))
-            .atZone(ZoneId.of("UTC"))
-            .toLocalDateTime();
-  }
-  
+
   public BinanceCoinDataDTO binanceCoinDataDtoFromStringArray(String[] dailyData, String coinName) {
-    LocalDateTime openTime = milliToLocalDateTime(dailyData[0]);
-    LocalDateTime closeTime = milliToLocalDateTime(dailyData[6]);
+    LocalDateTime openTime = TimeConverter.milliToLocalDateTime(dailyData[0]);
+    LocalDateTime closeTime = TimeConverter.milliToLocalDateTime(dailyData[6]);
     
     BinanceCoinDataDTO binanceCoinDataDTO = BinanceCoinDataDTO.builder()
             .coin(coinName)
