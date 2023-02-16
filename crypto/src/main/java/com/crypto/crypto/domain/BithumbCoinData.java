@@ -26,18 +26,16 @@ public class BithumbCoinData {
   private String tradePrice;
   private String highPrice;
   private String lowPrice;
-  private String candleAccTradeVolume;
 
   @Builder
   public BithumbCoinData(String coin, LocalDateTime candleDateTime, String openingPrice, String tradePrice,
-    String highPrice, String lowPrice, String candleAccTradeVolume) {
+    String highPrice, String lowPrice) {
     this.coin = coin;
     this.candleDateTime = candleDateTime;
     this.openingPrice = openingPrice;
     this.tradePrice = tradePrice;
     this.highPrice = highPrice;
     this.lowPrice = lowPrice;
-    this.candleAccTradeVolume = candleAccTradeVolume;
   }
 
   public static BithumbCoinData createFromBithumbCoinDataDto(BithumbCoinDataDTO bithumbCoinDataDTO) {
@@ -48,7 +46,6 @@ public class BithumbCoinData {
       .tradePrice(bithumbCoinDataDTO.getTradePrice())
       .highPrice(bithumbCoinDataDTO.getHighPrice())
       .lowPrice(bithumbCoinDataDTO.getLowPrice())
-      .candleAccTradeVolume(bithumbCoinDataDTO.getCandleAccTradeVolume())
       .build();
     return bithumbCoinData;
   }

@@ -14,11 +14,5 @@ public class BinanceCoinDataDTO {
   private String highPrice;
   private String lowPrice;
   private String closePrice;
-  private String volume;
-  private LocalDateTime closeTime;
-  private String quoteAssetVolume;
-  private String numTrades;
-  private String takerBuyBaseAssetVolume;
-  private String takerBuyQuoteAssetVolume;
 
 }

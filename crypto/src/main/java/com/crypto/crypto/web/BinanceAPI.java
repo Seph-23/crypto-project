@@ -103,12 +103,6 @@ public class BinanceAPI {
             .highPrice(dailyData[2])
             .lowPrice(dailyData[3])
             .closePrice(dailyData[4])
-            .volume(dailyData[5])
-            .closeTime(closeTime)
-            .quoteAssetVolume(dailyData[7])
-            .numTrades(dailyData[8])
-            .takerBuyBaseAssetVolume(dailyData[9])
-            .takerBuyQuoteAssetVolume(dailyData[10])
             .build();
     
     return binanceCoinDataDTO;

@@ -109,7 +109,6 @@ public class BithumbAPI {
       .tradePrice(dailyData[2])
       .highPrice(dailyData[3])
       .lowPrice(dailyData[4])
-      .candleAccTradeVolume(dailyData[5])
       .build();
 
     return bithumbCoinDataDTO;
