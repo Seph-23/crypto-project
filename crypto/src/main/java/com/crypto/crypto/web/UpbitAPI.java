@@ -5,11 +5,13 @@ import com.crypto.crypto.service.UpbitService;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Service
+@Transactional(readOnly = true)
 public class UpbitAPI {
   
   private UpbitService upbitService;
