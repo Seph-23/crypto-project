@@ -24,7 +24,7 @@ public class BithumbAPI {
 
   private final BithumbService bithumbService;
 
-  public void initBitumbCoindData(String[] coins) {
+  public void initBitumbCoinData(String[] coins) {
     IntStream.range(0, coins.length).forEach(i -> {
       try {
         Gson gson = new Gson();
