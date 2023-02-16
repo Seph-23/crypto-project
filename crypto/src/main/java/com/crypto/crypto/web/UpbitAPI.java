@@ -5,13 +5,13 @@ import com.crypto.crypto.service.UpbitService;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Service
-@Transactional(readOnly = true)
+
 public class UpbitAPI {
   
   private UpbitService upbitService;
@@ -80,12 +80,13 @@ public class UpbitAPI {
   public UpbitCoinDataDTO upbitCoinDataDTOBuilder(String[] individualCoinInfo, String tempInfo, String coinName){
     UpbitCoinDataDTO coin = UpbitCoinDataDTO.builder()
             .coin(coinName)
-            .candleDateTimeUtc(LocalDateTime.parse(individualCoinInfo[1].split("\":")[1].replace("\"", "")))
+
             .openingPrice(individualCoinInfo[3].split("\":")[1])
             .highPrice(individualCoinInfo[4].split("\":")[1])
             .lowPrice(individualCoinInfo[5].split("\":")[1])
             .tradePrice(individualCoinInfo[6].split("\":")[1])
             .timestamp(individualCoinInfo[7].split("\":")[1])
+
             .build();
     return coin;
   }
