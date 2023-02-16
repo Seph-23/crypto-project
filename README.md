@@ -63,3 +63,14 @@
     - 데이터 가져올때 로그 기록 (ex: 거래소 - 요청 시간)
 
 #### 02/12/2023
+  - 엔티티 pk를 coin 이름이랑 candleDateTime (UTC) 으로 변경
+    - coin, opentime, price (binance) 
+    - coin, candledatetime, price (bithumb) 
+    - coin, candledatetimeutc, price (upbit)
+  - alphavantage API 
+    - 어떤 데이터를 활용할수 있을지
+  - 스케줄러 실시간 데이터 업데이트
+  - 분석 서버
+    - myBatis 데이터 읽어와서 분석
+  - API 서버 구조
+    - 토큰 -> 레디스 저장

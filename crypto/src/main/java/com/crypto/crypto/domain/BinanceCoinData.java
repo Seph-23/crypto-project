@@ -26,30 +26,16 @@ public class BinanceCoinData {
   private String highPrice;
   private String lowPrice;
   private String closePrice;
-  private String volume;
-  private LocalDateTime closeTime;
-  private String quoteAssetVolume;
-  private String numTrades;
-  private String takerBuyBaseAssetVolume;
-  private String takerBuyQuoteAssetVolume;
 
   @Builder
   public BinanceCoinData(String coin, LocalDateTime openTime, String openingPrice, String highPrice,
-    String lowPrice, String closePrice, String volume, LocalDateTime closeTime,
-    String quoteAssetVolume, String numTrades, String takerBuyBaseAssetVolume,
-    String takerBuyQuoteAssetVolume) {
+    String lowPrice, String closePrice) {
     this.coin = coin;
     this.openTime = openTime;
     this.openingPrice = openingPrice;
     this.highPrice = highPrice;
     this.lowPrice = lowPrice;
     this.closePrice = closePrice;
-    this.volume = volume;
-    this.closeTime = closeTime;
-    this.quoteAssetVolume = quoteAssetVolume;
-    this.numTrades = numTrades;
-    this.takerBuyBaseAssetVolume = takerBuyBaseAssetVolume;
-    this.takerBuyQuoteAssetVolume = takerBuyQuoteAssetVolume;
   }
 
   public static BinanceCoinData createFromBinanceCoinDataDto(BinanceCoinDataDTO binanceCoinDataDTO) {
@@ -60,12 +46,6 @@ public class BinanceCoinData {
       .highPrice(binanceCoinDataDTO.getHighPrice())
       .lowPrice(binanceCoinDataDTO.getLowPrice())
       .closePrice(binanceCoinDataDTO.getClosePrice())
-      .volume(binanceCoinDataDTO.getVolume())
-      .closeTime(binanceCoinDataDTO.getCloseTime())
-      .quoteAssetVolume(binanceCoinDataDTO.getQuoteAssetVolume())
-      .numTrades(binanceCoinDataDTO.getNumTrades())
-      .takerBuyBaseAssetVolume(binanceCoinDataDTO.getTakerBuyBaseAssetVolume())
-      .takerBuyQuoteAssetVolume(binanceCoinDataDTO.getTakerBuyQuoteAssetVolume())
       .build();
     return binanceCoinData;
   }
