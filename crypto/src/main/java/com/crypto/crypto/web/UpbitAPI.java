@@ -4,19 +4,23 @@ import com.crypto.crypto.dto.UpbitCoinDataDTO;
 import com.crypto.crypto.service.UpbitService;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class UpbitAPI {
   
-  private UpbitService upbitService;
+  private final UpbitService upbitService;
   
   //Method for basic parsing of json response
+  @Transactional
   public String[] getCoinHistory(String coinName, String date) throws Exception {
     if(date.equals(null)){
       HttpResponse<String> response = Unirest.get("https://api.upbit.com/v1/candles/days?market=krw-" + coinName + "&count=200")
@@ -35,23 +39,28 @@ public class UpbitAPI {
       return temp;
     }
   }
-  
-  public void buildHistory(String[] coins) throws Exception{
-    String date = Instant.now().toString().split("T")[0];
-    for(int i = 0; i< coins.length; i++){
-      while(true){
-        String[] coinInfo = getCoinHistory(coins[i], date);
-        if(coinInfo.length == 1){
-          break;
-        }
-        saveCoin(coinInfo, coins[i], upbitService);
-        date = parseDate(coinInfo);
-        try {
-          Thread.sleep(200);
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
+
+  @Transactional
+  public void buildHistory(String[] coins) {
+    try {
+      String date = Instant.now().toString().split("T")[0];
+      for (int i = 0; i < 1; i++) {
+        while (true) {
+          String[] coinInfo = getCoinHistory(coins[i], date);
+          if (coinInfo.length == 1) {
+            break;
+          }
+          saveCoin(coinInfo, coins[i]);
+          date = parseDate(coinInfo);
+          try {
+            Thread.sleep(200);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
         }
       }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
   
@@ -63,7 +72,7 @@ public class UpbitAPI {
     return coinInfo;
   }
   
-  public void saveCoin(String[] coinData, String coinName, UpbitService upbitService){
+  public void saveCoin(String[] coinData, String coinName){
     for (int i = 0; i < coinData.length; i++) {
       String[] individualCoinInfo = coinData[i].split(",");
       String tempInfo = null;
@@ -80,13 +89,12 @@ public class UpbitAPI {
   public UpbitCoinDataDTO upbitCoinDataDTOBuilder(String[] individualCoinInfo, String tempInfo, String coinName){
     UpbitCoinDataDTO coin = UpbitCoinDataDTO.builder()
             .coin(coinName)
-
+            .candleDateTime(LocalDateTime.parse(individualCoinInfo[1].split("\":")[1].replace("\"", "")))
             .openingPrice(individualCoinInfo[3].split("\":")[1])
             .highPrice(individualCoinInfo[4].split("\":")[1])
             .lowPrice(individualCoinInfo[5].split("\":")[1])
             .tradePrice(individualCoinInfo[6].split("\":")[1])
             .timestamp(individualCoinInfo[7].split("\":")[1])
-
             .build();
     return coin;
   }

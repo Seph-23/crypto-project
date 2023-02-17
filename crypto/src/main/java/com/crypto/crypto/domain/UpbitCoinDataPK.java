@@ -1,5 +1,24 @@
 package com.crypto.crypto.domain;
 
-public class UpbitCoinDataPK {
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpbitCoinDataPK implements Serializable {
+
+  private String coin;
+  private LocalDateTime candleDateTime;
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
 }

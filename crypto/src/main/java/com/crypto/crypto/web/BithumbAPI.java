@@ -25,8 +25,9 @@ public class BithumbAPI {
 
   private final BithumbService bithumbService;
 
+  @Transactional
   public void initBitumbCoinData(String[] coins) {
-    IntStream.range(0, coins.length).forEach(i -> {
+    IntStream.range(0, 1).forEach(i -> {
       try {
         Gson gson = new Gson();
         String data = getData(coins[i]);
@@ -54,6 +55,7 @@ public class BithumbAPI {
     });
   }
 
+  @Transactional
   public String getData(String coin) throws IOException, InterruptedException {
     //호출할 코인 URL 빌드
     StringBuilder sb = new StringBuilder();

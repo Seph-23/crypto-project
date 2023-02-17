@@ -2,10 +2,8 @@ package com.crypto.crypto.domain;
 
 import com.crypto.crypto.dto.UpbitCoinDataDTO;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.io.Serializable;
+import jakarta.persistence.IdClass;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,14 +11,15 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@IdClass(UpbitCoinDataPK.class)
 public class UpbitCoinData {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
-
   private String coin;
-  private LocalDateTime candleDateTimeUtc;
+
+  @Id
+  private LocalDateTime candleDateTime;
+
   private String openingPrice;
   private String highPrice;
   private String lowPrice;
@@ -28,11 +27,11 @@ public class UpbitCoinData {
   private String timestamp;
   
   @Builder
-  public UpbitCoinData(String coin, String market, LocalDateTime candleDateTimeUtc,
+  public UpbitCoinData(String coin, LocalDateTime candleDateTime,
                        String openingPrice, String highPrice, String lowPrice,
                        String tradePrice, String timestamp) {
     this.coin = coin;
-    this.candleDateTimeUtc = candleDateTimeUtc;
+    this.candleDateTime = candleDateTime;
     this.openingPrice = openingPrice;
     this.highPrice = highPrice;
     this.lowPrice = lowPrice;
@@ -43,7 +42,7 @@ public class UpbitCoinData {
   public static UpbitCoinData createFromUpbitCoinDataDTO(UpbitCoinDataDTO upbitCoinDataDTO){
     UpbitCoinData upbitCoinData = UpbitCoinData.builder()
             .coin(upbitCoinDataDTO.getCoin())
-            .candleDateTimeUtc(upbitCoinDataDTO.getCandleDateTimeUtc())
+            .candleDateTime(upbitCoinDataDTO.getCandleDateTime())
             .openingPrice(upbitCoinDataDTO.getOpeningPrice())
             .highPrice(upbitCoinDataDTO.getHighPrice())
             .lowPrice(upbitCoinDataDTO.getLowPrice())

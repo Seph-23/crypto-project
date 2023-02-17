@@ -1,8 +1,14 @@
 package com.crypto.crypto;
 
 
+import com.crypto.crypto.web.BinanceAPI;
+import com.crypto.crypto.web.BithumbAPI;
+import com.crypto.crypto.web.UpbitAPI;
+import java.util.stream.IntStream;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class CryptoApplication {
@@ -19,6 +25,5 @@ public class CryptoApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CryptoApplication.class, args);
 	}
-
 
 }

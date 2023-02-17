@@ -23,6 +23,7 @@ public class BinanceAPI {
   
   private final BinanceService binanceService;
 
+  @Transactional
   public String getData(String coin, String date) throws IOException, InterruptedException {
     //호출할 코인 URL 빌드
     StringBuilder sb = new StringBuilder();
@@ -50,38 +51,44 @@ public class BinanceAPI {
     System.out.println("Binance " + coin + " 요청");
     return response.body();
   }
-  
-  public void buildHistory(String[] coins) throws  Exception{
-    LocalDateTime localDateTime = LocalDateTime.parse("2023-02-10T00:00:00");
-    String date = String.valueOf(localDateTime.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli());
-  
-    for(int i = 0; i< coins.length; i++){
-      while(true){
-        String data = getData(coins[i], date);
-    
-    
-        data = data.replace("[[", "[");
-        data = data.replace("]]", "]");
-    
-        String[] coinData = data.split("],");
-    
-        if(date.equals(coinData[0].split(",")[0].replace("[", "")) || data.length() < 3 ){
-          System.out.println("done");
-          break;
-        }
-    
-        date = coinData[0].split(",")[0].replace("[", "");
-    
-        for (int j = 0; j < coinData.length; j++) {
-          coinData[j] = coinData[j].replace("[", "");
-          coinData[j] = coinData[j].replace("]", "");
-          coinData[j] = coinData[j].replace("\"", "");
-          String[] dailyData = coinData[j].split(",");
-          BinanceCoinDataDTO binanceCoinDataDTO = binanceCoinDataDtoFromStringArray(dailyData, coins[i]);
-      
-          binanceService.addData(binanceCoinDataDTO);
+
+  @Transactional
+  public void buildHistory(String[] coins) {
+    try {
+      LocalDateTime localDateTime = LocalDateTime.parse("2023-02-10T00:00:00");
+      String date = String.valueOf(
+        localDateTime.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli());
+
+      for (int i = 0; i < 1; i++) {
+        while (true) {
+          String data = getData(coins[i], date);
+
+          data = data.replace("[[", "[");
+          data = data.replace("]]", "]");
+
+          String[] coinData = data.split("],");
+
+          if (date.equals(coinData[0].split(",")[0].replace("[", "")) || data.length() < 3) {
+            System.out.println("done");
+            break;
+          }
+
+          date = coinData[0].split(",")[0].replace("[", "");
+
+          for (int j = 0; j < coinData.length; j++) {
+            coinData[j] = coinData[j].replace("[", "");
+            coinData[j] = coinData[j].replace("]", "");
+            coinData[j] = coinData[j].replace("\"", "");
+            String[] dailyData = coinData[j].split(",");
+            BinanceCoinDataDTO binanceCoinDataDTO = binanceCoinDataDtoFromStringArray(dailyData,
+              coins[i]);
+
+            binanceService.addData(binanceCoinDataDTO);
+          }
         }
       }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 

@@ -16,14 +16,15 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BinanceCoinData  {
+@IdClass(BinanceCoinDataPK.class)
+public class BinanceCoinData {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
-
   private String coin;
+
+  @Id
   private LocalDateTime openTime;
+
   private String openingPrice;
   private String highPrice;
   private String lowPrice;
