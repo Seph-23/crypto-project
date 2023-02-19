@@ -31,9 +31,9 @@ public class HomeController {
   @GetMapping("/init/data")
   public String initData() {
 
-//    bithumbAPI.initBitumbCoinData(coins);
+    bithumbAPI.initBitumbCoinData(coins);
 //    upbitAPI.buildHistory(coins);
-    binanceAPI.buildHistory(coins);
+//    binanceAPI.buildHistory(coins);
 
     return "Init Data";
   }

@@ -1,5 +1,6 @@
 package com.crypto.crypto.web;
 
+import com.crypto.crypto.domain.BithumbCoinData;
 import com.crypto.crypto.dto.BithumbCoinDataDTO;
 import com.crypto.crypto.service.BithumbService;
 import com.crypto.crypto.utils.TimeConverter;
@@ -19,15 +20,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BithumbAPI {
 
   private final BithumbService bithumbService;
 
-  @Transactional
   public void initBitumbCoinData(String[] coins) {
-    IntStream.range(0, 1).forEach(i -> {
+    IntStream.range(0, coins.length).forEach(i -> {
       try {
         Gson gson = new Gson();
         String data = getData(coins[i]);
@@ -44,18 +43,18 @@ public class BithumbAPI {
 
             BithumbCoinDataDTO bithumbCoinDataDTO =
               bithumbCoinDataDtoFromStringArray(dailyData, i, coins);
-            
-            bithumbService.addData(bithumbCoinDataDTO);
+
+            BithumbCoinData bithumbCoinData = bithumbService.addData(bithumbCoinDataDTO);
+//            System.out.println("bithumbCoinData.getCandleDateTime() = " + bithumbCoinData.getCandleDateTime());
           }
         }
-        Thread.sleep(1000);
+        Thread.sleep(200);
       } catch (Exception e) {
         e.printStackTrace();
       }
     });
   }
 
-  @Transactional
   public String getData(String coin) throws IOException, InterruptedException {
     //호출할 코인 URL 빌드
     StringBuilder sb = new StringBuilder();
@@ -73,6 +72,7 @@ public class BithumbAPI {
       .send(request, HttpResponse.BodyHandlers.ofString());
 
     System.out.println("BithumbAPI " + coin + " 데이터 요청");
+//    System.out.println(response.body());
 
     return response.body();
   }

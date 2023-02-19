@@ -26,4 +26,25 @@ public class CryptoApplication {
 		SpringApplication.run(CryptoApplication.class, args);
 	}
 
+//	@Bean
+//	public CommandLineRunner initData(BithumbAPI bithumbAPI) {
+//		return args -> {
+//			bithumbAPI.initBitumbCoinData(coins);
+//		};
+//	}
+//
+//	@Bean
+//	public CommandLineRunner initData2(BinanceAPI binanceAPI) {
+//		return args -> {
+//			binanceAPI.buildHistory(coins);
+//		};
+//	}
+//
+//	@Bean
+//	public CommandLineRunner initData3(UpbitAPI upbitAPI) {
+//		return args -> {
+//			upbitAPI.buildHistory(coins);
+//		};
+//	}
+
 }

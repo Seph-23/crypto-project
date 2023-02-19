@@ -13,14 +13,12 @@ import java.time.LocalDateTime;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UpbitAPI {
   
   private final UpbitService upbitService;
   
   //Method for basic parsing of json response
-  @Transactional
   public String[] getCoinHistory(String coinName, String date) throws Exception {
     if(date.equals(null)){
       HttpResponse<String> response = Unirest.get("https://api.upbit.com/v1/candles/days?market=krw-" + coinName + "&count=200")
@@ -40,11 +38,10 @@ public class UpbitAPI {
     }
   }
 
-  @Transactional
   public void buildHistory(String[] coins) {
     try {
       String date = Instant.now().toString().split("T")[0];
-      for (int i = 0; i < 1; i++) {
+      for (int i = 0; i < coins.length; i++) {
         while (true) {
           String[] coinInfo = getCoinHistory(coins[i], date);
           if (coinInfo.length == 1) {
@@ -58,6 +55,7 @@ public class UpbitAPI {
             throw new RuntimeException(e);
           }
         }
+        Thread.sleep(200);
       }
     } catch (Exception e) {
       e.printStackTrace();

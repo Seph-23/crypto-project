@@ -17,13 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BinanceAPI {
   
   private final BinanceService binanceService;
 
-  @Transactional
   public String getData(String coin, String date) throws IOException, InterruptedException {
     //호출할 코인 URL 빌드
     StringBuilder sb = new StringBuilder();
@@ -52,14 +50,13 @@ public class BinanceAPI {
     return response.body();
   }
 
-  @Transactional
   public void buildHistory(String[] coins) {
     try {
-      LocalDateTime localDateTime = LocalDateTime.parse("2023-02-10T00:00:00");
+      LocalDateTime localDateTime = LocalDateTime.parse("2023-02-19T00:00:00");
       String date = String.valueOf(
         localDateTime.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli());
 
-      for (int i = 0; i < 1; i++) {
+      for (int i = 0; i < coins.length; i++) {
         while (true) {
           String data = getData(coins[i], date);
 
@@ -85,7 +82,9 @@ public class BinanceAPI {
 
             binanceService.addData(binanceCoinDataDTO);
           }
+          Thread.sleep(200);
         }
+        Thread.sleep(200);
       }
     } catch (Exception e) {
       e.printStackTrace();
