@@ -12,7 +12,5 @@ public class BithumbCoinDataDTO {   //Daily
   private LocalDateTime candleDateTime;
   private String openingPrice;
   private String tradePrice;
-  private String highPrice;
-  private String lowPrice;
 
 }
