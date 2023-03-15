@@ -88,11 +88,8 @@ public class UpbitAPI {
     UpbitCoinDataDTO coin = UpbitCoinDataDTO.builder()
             .coin(coinName)
             .candleDateTime(LocalDateTime.parse(individualCoinInfo[1].split("\":")[1].replace("\"", "")))
-            .openingPrice(individualCoinInfo[3].split("\":")[1])
             .highPrice(individualCoinInfo[4].split("\":")[1])
             .lowPrice(individualCoinInfo[5].split("\":")[1])
-            .tradePrice(individualCoinInfo[6].split("\":")[1])
-            .timestamp(individualCoinInfo[7].split("\":")[1])
             .build();
     return coin;
   }

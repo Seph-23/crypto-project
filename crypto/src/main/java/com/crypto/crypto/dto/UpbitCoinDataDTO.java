@@ -13,10 +13,7 @@ public class UpbitCoinDataDTO {
   
   private String coin;
   private LocalDateTime candleDateTime;
-  private String openingPrice;
   private String highPrice;
   private String lowPrice;
-  private String tradePrice;
-  private String timestamp;
-  
+
 }
