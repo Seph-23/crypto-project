@@ -83,7 +83,7 @@ public class BithumbAPI {
    * @param coinsIndex
    * @return BithumbCoinDataDTO
    */
-  public BithumbCoinDataDTO bithumbCoinDataDtoFromStringArray(String[] dailyData, int coinsIndex,
+  private BithumbCoinDataDTO bithumbCoinDataDtoFromStringArray(String[] dailyData, int coinsIndex,
     String[] coins) {
 
     LocalDateTime day = TimeConverter.milliToLocalDateTime(dailyData[0]);

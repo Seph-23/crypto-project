@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class BinanceCoinDataPK implements Serializable {
 
   private String coin;
-  private LocalDateTime openTime;
+  private LocalDateTime candleDateTime;
 
   @Override
   public int hashCode() {

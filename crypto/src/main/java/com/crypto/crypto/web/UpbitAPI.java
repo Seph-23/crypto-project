@@ -62,7 +62,7 @@ public class UpbitAPI {
     }
   }
   
-  public String[] parseData(HttpResponse<String> response){
+  private String[] parseData(HttpResponse<String> response){
     String testMessage = response.getBody();
     testMessage = testMessage.replace("{", "");
     testMessage = testMessage.replace("[", "");
@@ -70,7 +70,7 @@ public class UpbitAPI {
     return coinInfo;
   }
   
-  public void saveCoin(String[] coinData, String coinName){
+  private void saveCoin(String[] coinData, String coinName){
     for (int i = 0; i < coinData.length; i++) {
       String[] individualCoinInfo = coinData[i].split(",");
       String tempInfo = null;
@@ -84,7 +84,7 @@ public class UpbitAPI {
     }
   }
   
-  public UpbitCoinDataDTO upbitCoinDataDTOBuilder(String[] individualCoinInfo, String tempInfo, String coinName){
+  private UpbitCoinDataDTO upbitCoinDataDTOBuilder(String[] individualCoinInfo, String tempInfo, String coinName){
     UpbitCoinDataDTO coin = UpbitCoinDataDTO.builder()
             .coin(coinName)
             .candleDateTime(LocalDateTime.parse(individualCoinInfo[1].split("\":")[1].replace("\"", "")))
@@ -97,7 +97,7 @@ public class UpbitAPI {
     return coin;
   }
   
-  public String parseDate(String[] coinData){
+  private String parseDate(String[] coinData){
     String lastSearch = coinData[coinData.length-1];
     String lastCoinDate = lastSearch.split(",")[2];
     String lastKst = lastCoinDate.split("\":\"")[1].replace("\"", "");

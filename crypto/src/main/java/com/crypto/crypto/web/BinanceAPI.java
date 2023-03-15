@@ -6,7 +6,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -14,7 +13,6 @@ import com.crypto.crypto.dto.BinanceCoinDataDTO;
 import com.crypto.crypto.service.BinanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -91,17 +89,15 @@ public class BinanceAPI {
     }
   }
 
-  public BinanceCoinDataDTO binanceCoinDataDtoFromStringArray(String[] dailyData, String coinName) {
+  private BinanceCoinDataDTO binanceCoinDataDtoFromStringArray(String[] dailyData, String coinName) {
     LocalDateTime openTime = TimeConverter.milliToLocalDateTime(dailyData[0]);
     LocalDateTime closeTime = TimeConverter.milliToLocalDateTime(dailyData[6]);
     
     BinanceCoinDataDTO binanceCoinDataDTO = BinanceCoinDataDTO.builder()
             .coin(coinName)
-            .openTime(openTime)
-            .openingPrice(dailyData[1])
+            .candleDateTime(openTime)
             .highPrice(dailyData[2])
             .lowPrice(dailyData[3])
-            .closePrice(dailyData[4])
             .build();
     
     return binanceCoinDataDTO;

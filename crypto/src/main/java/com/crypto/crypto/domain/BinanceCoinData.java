@@ -2,11 +2,8 @@ package com.crypto.crypto.domain;
 
 import com.crypto.crypto.dto.BinanceCoinDataDTO;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,32 +20,27 @@ public class BinanceCoinData {
   private String coin;
 
   @Id
-  private LocalDateTime openTime;
+  private LocalDateTime candleDateTime;
 
-  private String openingPrice;
   private String highPrice;
   private String lowPrice;
   private String closePrice;
 
   @Builder
-  public BinanceCoinData(String coin, LocalDateTime openTime, String openingPrice, String highPrice,
-    String lowPrice, String closePrice) {
+  public BinanceCoinData(String coin, LocalDateTime candleDateTime, String highPrice,
+    String lowPrice) {
     this.coin = coin;
-    this.openTime = openTime;
-    this.openingPrice = openingPrice;
+    this.candleDateTime = candleDateTime;
     this.highPrice = highPrice;
     this.lowPrice = lowPrice;
-    this.closePrice = closePrice;
   }
 
   public static BinanceCoinData createFromBinanceCoinDataDto(BinanceCoinDataDTO binanceCoinDataDTO) {
     BinanceCoinData binanceCoinData = BinanceCoinData.builder()
       .coin(binanceCoinDataDTO.getCoin())
-      .openTime(binanceCoinDataDTO.getOpenTime())
-      .openingPrice(binanceCoinDataDTO.getOpeningPrice())
+      .candleDateTime(binanceCoinDataDTO.getCandleDateTime())
       .highPrice(binanceCoinDataDTO.getHighPrice())
       .lowPrice(binanceCoinDataDTO.getLowPrice())
-      .closePrice(binanceCoinDataDTO.getClosePrice())
       .build();
     return binanceCoinData;
   }
