@@ -1,5 +1,6 @@
 package com.crypto.crypto.service;
 
+import com.crypto.crypto.domain.BinanceCoinData;
 import com.crypto.crypto.domain.BithumbCoinData;
 import com.crypto.crypto.dto.BithumbCoinDataDTO;
 import com.crypto.crypto.repository.BithumbRepository;
@@ -15,10 +16,10 @@ public class BithumbService {
   private final BithumbRepository bithumbRepository;
 
   @Transactional
-  public void addData(BithumbCoinDataDTO bithumbCoinDataDTO) {
+  public BithumbCoinData addData(BithumbCoinDataDTO bithumbCoinDataDTO) {
     BithumbCoinData bithumbCoinData = BithumbCoinData
       .createFromBithumbCoinDataDto(bithumbCoinDataDTO);
-    bithumbRepository.save(bithumbCoinData);
+    return bithumbRepository.save(bithumbCoinData);
   }
 
 }

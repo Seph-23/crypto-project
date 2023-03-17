@@ -9,10 +9,8 @@ import lombok.Data;
 public class BinanceCoinDataDTO {
 
   private String coin;
-  private LocalDateTime openTime;
-  private String openingPrice;
+  private LocalDateTime candleDateTime;
   private String highPrice;
   private String lowPrice;
-  private String closePrice;
 
 }

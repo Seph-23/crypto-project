@@ -12,11 +12,8 @@ import java.time.LocalDateTime;
 public class UpbitCoinDataDTO {
   
   private String coin;
-  private LocalDateTime candleDateTimeUtc;
-  private String openingPrice;
+  private LocalDateTime candleDateTime;
   private String highPrice;
   private String lowPrice;
-  private String tradePrice;
-  private String timestamp;
-  
+
 }

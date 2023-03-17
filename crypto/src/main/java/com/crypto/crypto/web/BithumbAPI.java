@@ -1,7 +1,9 @@
 package com.crypto.crypto.web;
 
+import com.crypto.crypto.domain.BithumbCoinData;
 import com.crypto.crypto.dto.BithumbCoinDataDTO;
 import com.crypto.crypto.service.BithumbService;
+import com.crypto.crypto.utils.TimeConverter;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.URI;
@@ -18,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BithumbAPI {
 
@@ -42,11 +43,12 @@ public class BithumbAPI {
 
             BithumbCoinDataDTO bithumbCoinDataDTO =
               bithumbCoinDataDtoFromStringArray(dailyData, i, coins);
-            
-            bithumbService.addData(bithumbCoinDataDTO);
+
+            BithumbCoinData bithumbCoinData = bithumbService.addData(bithumbCoinDataDTO);
+//            System.out.println("bithumbCoinData.getCandleDateTime() = " + bithumbCoinData.getCandleDateTime());
           }
         }
-        Thread.sleep(1000);
+        Thread.sleep(200);
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -70,21 +72,9 @@ public class BithumbAPI {
       .send(request, HttpResponse.BodyHandlers.ofString());
 
     System.out.println("BithumbAPI " + coin + " 데이터 요청");
+//    System.out.println(response.body());
 
     return response.body();
-  }
-
-  /**
-   * 빗썸에서 제공하는 캔들 기준 시간(millisecond)를 LocalDateTime으로 변환하는 메서드.
-   * @param milli
-   * @return LocalDateTime 캔들날짜
-   */
-  public LocalDateTime milliToLocalDateTime(String milli) {
-    String result = String.format("%.0f", Double.parseDouble(milli));
-
-    return Instant.ofEpochMilli(Long.parseLong(result))
-      .atZone(ZoneId.of("UTC"))
-      .toLocalDateTime();
   }
 
   /**
@@ -93,10 +83,10 @@ public class BithumbAPI {
    * @param coinsIndex
    * @return BithumbCoinDataDTO
    */
-  public BithumbCoinDataDTO bithumbCoinDataDtoFromStringArray(String[] dailyData, int coinsIndex,
+  private BithumbCoinDataDTO bithumbCoinDataDtoFromStringArray(String[] dailyData, int coinsIndex,
     String[] coins) {
 
-    LocalDateTime day = milliToLocalDateTime(dailyData[0]);
+    LocalDateTime day = TimeConverter.milliToLocalDateTime(dailyData[0]);
 
     if (dailyData[5].contains("]]")) {
       dailyData[5] = dailyData[5].replace("]]", "");
@@ -107,8 +97,6 @@ public class BithumbAPI {
       .candleDateTime(day)
       .openingPrice(dailyData[1])
       .tradePrice(dailyData[2])
-      .highPrice(dailyData[3])
-      .lowPrice(dailyData[4])
       .build();
 
     return bithumbCoinDataDTO;
