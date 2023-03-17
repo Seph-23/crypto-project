@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,8 +17,8 @@ public class UpbitAPI {
   
   private final UpbitService upbitService;
   
-  //Method for basic parsing of json response
-  public String[] getCoinHistory(String coinName, String date) throws Exception {
+  //Send and receives records of cryptocurrency history
+  public String[] callCoinHistory(String coinName, String date) throws Exception {
     if(date.equals(null)){
       HttpResponse<String> response = Unirest.get("https://api.upbit.com/v1/candles/days?market=krw-" + coinName + "&count=200")
               .header("accept", "application/json")
@@ -37,13 +36,22 @@ public class UpbitAPI {
       return temp;
     }
   }
+  
+  public String[] getCoinData(String coin) throws Exception{
+    HttpResponse<String> response = Unirest.get("https://api.upbit.com/v1/candles/minutes/1?market=krw-" + coin + "&count=1" )
+            .header("accept", "application/json")
+            .asString();
+    String[] temp = parseData(response);
+    System.out.println("Upbit " + coin + " 요청");
+    return temp;
+  }
 
-  public void buildHistory(String[] coins) {
+  public void saveCoinHistory(String[] coins) {
     try {
       String date = Instant.now().toString().split("T")[0];
       for (int i = 0; i < coins.length; i++) {
         while (true) {
-          String[] coinInfo = getCoinHistory(coins[i], date);
+          String[] coinInfo = callCoinHistory(coins[i], date);
           if (coinInfo.length == 1) {
             break;
           }
@@ -62,6 +70,12 @@ public class UpbitAPI {
     }
   }
   
+  public void saveCoinData(String coin) throws Exception{
+    String[] coinInfo = getCoinData(coin);
+    saveCoin(coinInfo, coin);
+    System.out.println("Upbit" + coin + "updated.");
+  }
+  
   private String[] parseData(HttpResponse<String> response){
     String testMessage = response.getBody();
     testMessage = testMessage.replace("{", "");
@@ -73,12 +87,12 @@ public class UpbitAPI {
   private void saveCoin(String[] coinData, String coinName){
     for (int i = 0; i < coinData.length; i++) {
       String[] individualCoinInfo = coinData[i].split(",");
-      String tempInfo = null;
+      String tempString = null;
       if (individualCoinInfo[12].contains("}")) {
-        tempInfo = (individualCoinInfo[12].replace("}]", "").split("\":")[1]);
-      } else tempInfo = (individualCoinInfo[12].split("\":")[1]);
+        tempString = (individualCoinInfo[12].replace("}]", "").split("\":")[1]);
+      } else tempString = (individualCoinInfo[12].split("\":")[1]);
   
-      UpbitCoinDataDTO upbitCoinDataDTO = upbitCoinDataDTOBuilder(individualCoinInfo, tempInfo, coinName);
+      UpbitCoinDataDTO upbitCoinDataDTO = upbitCoinDataDTOBuilder(individualCoinInfo, tempString, coinName);
   
       upbitService.addData(upbitCoinDataDTO);
     }

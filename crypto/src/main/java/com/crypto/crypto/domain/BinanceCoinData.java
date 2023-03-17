@@ -24,7 +24,6 @@ public class BinanceCoinData {
 
   private String highPrice;
   private String lowPrice;
-  private String closePrice;
 
   @Builder
   public BinanceCoinData(String coin, LocalDateTime candleDateTime, String highPrice,
