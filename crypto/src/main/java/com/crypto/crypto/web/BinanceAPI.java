@@ -20,7 +20,7 @@ public class BinanceAPI {
   
   private final BinanceService binanceService;
 
-  public String getData(String coin, String date) throws IOException, InterruptedException {
+  public String getCoinHistory(String coin, String date) throws IOException, InterruptedException {
     //호출할 코인 URL 빌드
     StringBuilder sb = new StringBuilder();
     sb.append("https://api.binance.com/api/v3/klines?symbol=")
@@ -47,8 +47,29 @@ public class BinanceAPI {
     System.out.println("Binance " + coin + " 요청");
     return response.body();
   }
+  
+  public String getCoinData(String coin) throws Exception{
+    StringBuilder sb = new StringBuilder();
+    sb.append("https://api.binance.com/api/v3/klines?symbol=")
+            .append(coin)
+            .append("BUSD&interval=1h")
+            .append("&limit=1");
+  
+  
+    //업비트 API 요청, JSON 형식으로 데이터 반환
+    HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(sb.toString()))
+            .header("accept", "application/json")
+            .method("GET", HttpRequest.BodyPublishers.noBody())
+            .build();
+    HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+  
+    System.out.println("response.statusCode() = " + response.statusCode());
+    
+    return response.body();
+  }
 
-  public void buildHistory(String[] coins) {
+  public void saveCoinHistory(String[] coins) {
     try {
       LocalDateTime localDateTime = LocalDateTime.parse("2023-02-19T00:00:00");
       String date = String.valueOf(
@@ -56,7 +77,7 @@ public class BinanceAPI {
 
       for (int i = 0; i < coins.length; i++) {
         while (true) {
-          String data = getData(coins[i], date);
+          String data = getCoinHistory(coins[i], date);
 
           data = data.replace("[[", "[");
           data = data.replace("]]", "]");
@@ -87,6 +108,21 @@ public class BinanceAPI {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+  
+  public void saveCoinData(String coin) throws Exception{
+    
+    String data = getCoinData(coin);
+    
+    data = data.replace("[[", "[");
+    data = data.replace("]]", "]");
+  
+    String[] coinData = data.split("],");
+  
+    BinanceCoinDataDTO binanceCoinDataDTO = binanceCoinDataDtoFromStringArray(coinData,
+            coin);
+  
+    binanceService.addData(binanceCoinDataDTO);
   }
 
   private BinanceCoinDataDTO binanceCoinDataDtoFromStringArray(String[] dailyData, String coinName) {
