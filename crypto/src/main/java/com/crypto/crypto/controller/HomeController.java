@@ -3,11 +3,9 @@ package com.crypto.crypto.controller;
 import com.crypto.crypto.web.BinanceAPI;
 import com.crypto.crypto.web.BithumbAPI;
 import com.crypto.crypto.web.UpbitAPI;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "*")
@@ -31,7 +29,7 @@ public class HomeController {
   @GetMapping("/init/data")
   public String initData() {
 
-    bithumbAPI.initBitumbCoinData(coins);
+    bithumbAPI.saveCoinHistory(coins);
 //    upbitAPI.buildHistory(coins);
 //    binanceAPI.buildHistory(coins);
 

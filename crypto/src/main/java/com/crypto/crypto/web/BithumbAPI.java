@@ -10,14 +10,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Map;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +22,14 @@ public class BithumbAPI {
 
   private final BithumbService bithumbService;
 
-  public void initBitumbCoinData(String[] coins) {
+  /**
+   * 거래소에서 가져온 과거 데이터를 저장하는 메서드
+   */
+  public void saveCoinHistory(String[] coins) {
     IntStream.range(0, coins.length).forEach(i -> {
       try {
         Gson gson = new Gson();
-        String data = getData(coins[i]);
+        String data = getCoinHistory(coins[i]);
         Map<String, Object> map = gson.fromJson(data, Map.class);	// map.get("status"), map.get("data")
         String dataStr = null;
 
@@ -45,7 +45,6 @@ public class BithumbAPI {
               bithumbCoinDataDtoFromStringArray(dailyData, i, coins);
 
             BithumbCoinData bithumbCoinData = bithumbService.addData(bithumbCoinDataDTO);
-//            System.out.println("bithumbCoinData.getCandleDateTime() = " + bithumbCoinData.getCandleDateTime());
           }
         }
         Thread.sleep(200);
@@ -55,7 +54,10 @@ public class BithumbAPI {
     });
   }
 
-  public String getData(String coin) throws IOException, InterruptedException {
+  /**
+   * 거래소에 해당 코인의 과거 데이터를 전부 요청하는 메서드
+   */
+  public String getCoinHistory(String coin) throws IOException, InterruptedException {
     //호출할 코인 URL 빌드
     StringBuilder sb = new StringBuilder();
     sb.append("https://api.bithumb.com/public/candlestick/")
@@ -72,7 +74,21 @@ public class BithumbAPI {
       .send(request, HttpResponse.BodyHandlers.ofString());
 
     System.out.println("BithumbAPI " + coin + " 데이터 요청");
-//    System.out.println(response.body());
+
+    return response.body();
+  }
+
+  public String getCoinData(String coin) throws IOException, InterruptedException {
+    StringBuilder sb = new StringBuilder();
+    sb.append("https://api.bithumb.com/public/ticker/")
+      .append(coin);
+
+    HttpRequest request = HttpRequest.newBuilder()
+      .uri(URI.create(sb.toString()))
+      .header("accept", "application/json")
+      .method("GET", HttpRequest.BodyPublishers.noBody())
+      .build();
+    HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
     return response.body();
   }
@@ -92,11 +108,13 @@ public class BithumbAPI {
       dailyData[5] = dailyData[5].replace("]]", "");
     }
 
+    System.out.println("dailyData.toString() = " + dailyData.toString());
+
     BithumbCoinDataDTO bithumbCoinDataDTO = BithumbCoinDataDTO.builder()		// 일별 데이터 DTO 생성
       .coin(coins[coinsIndex])
       .candleDateTime(day)
-      .openingPrice(dailyData[1])
-      .tradePrice(dailyData[2])
+      .highPrice(dailyData[3])
+      .lowPrice(dailyData[4])
       .build();
 
     return bithumbCoinDataDTO;

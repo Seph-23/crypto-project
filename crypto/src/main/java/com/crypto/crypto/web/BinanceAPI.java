@@ -109,6 +109,8 @@ public class BinanceAPI {
       e.printStackTrace();
     }
   }
+
+
   
   public void saveCoinData(String coin) throws Exception{
     
