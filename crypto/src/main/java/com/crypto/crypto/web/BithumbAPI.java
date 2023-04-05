@@ -70,10 +70,7 @@ public class BithumbAPI {
       .header("accept", "application/json")
       .method("GET", HttpRequest.BodyPublishers.noBody())
       .build();
-    HttpResponse<String> response = HttpClient.newHttpClient()
-      .send(request, HttpResponse.BodyHandlers.ofString());
-
-    System.out.println("BithumbAPI " + coin + " 데이터 요청");
+    HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
     return response.body();
   }
@@ -93,6 +90,31 @@ public class BithumbAPI {
     return response.body();
   }
 
+  public String saveCoinData(String coin){
+    try {
+      String data = getCoinData(coin);
+      Gson gson = new Gson();
+      Map<String, Object> map = gson.fromJson(data, Map.class);  // map.get("status"), map.get("data")
+      String dataStr = null;
+      if (map.get("status").toString().equals("0000")) {        // 통신 성공시 (status code: 0000)
+        dataStr = map.get("data").toString();
+        map = gson.fromJson(dataStr, Map.class);
+        LocalDateTime day = TimeConverter.milliToLocalDateTime(String.valueOf(System.currentTimeMillis()));
+        BithumbCoinDataDTO bithumbCoinDataDTO = BithumbCoinDataDTO.builder()		// 일별 데이터 DTO 생성
+          .coin(coin)
+          .candleDateTime(day)
+          .highPrice(String.format("%.0f", Double.parseDouble(map.get("max_price").toString())))
+          .lowPrice(String.format("%.0f", Double.parseDouble(map.get("min_price").toString())))
+          .build();
+        BithumbCoinData bithumbCoinData = bithumbService.addData(bithumbCoinDataDTO);
+      }
+    } catch(Exception e){
+      e.printStackTrace();
+    }
+
+    return "hello";
+  }
+
   /**
    * 빗썸에서 추출한 일별 코인 데이터를 DTO로 변환하는 메서드.
    * @param dailyData
@@ -107,9 +129,6 @@ public class BithumbAPI {
     if (dailyData[5].contains("]]")) {
       dailyData[5] = dailyData[5].replace("]]", "");
     }
-
-    System.out.println("dailyData.toString() = " + dailyData.toString());
-
     BithumbCoinDataDTO bithumbCoinDataDTO = BithumbCoinDataDTO.builder()		// 일별 데이터 DTO 생성
       .coin(coins[coinsIndex])
       .candleDateTime(day)
